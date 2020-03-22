@@ -1,0 +1,21 @@
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa
+server-->browser: HTML-code
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser: main.css
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa.js
+server-->browser: spa.js
+
+note over browser:
+- executes JS that fetches data.json asynchronously
+- window.onload changes behaviour of submit
+end note
+
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser: data.json
+
+note over browser:
+- When data.json is received event handler triggers,
+JSON is parsed and redrawNotes called.
+- redrawNotes compiles new list out of the data from
+data.json, removes old list if it exists, and renders to DOM
+end note

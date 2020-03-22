@@ -1,0 +1,18 @@
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note\nFormData: {note: new note}
+
+note over server: Creates new note based\non content of FormData\nand pushes it to array notes
+
+server-->browser: HTTP 302: {Location: /notes}
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+server-->browser: HTML-code
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser: main.css
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+server-->browser: main.js
+
+note over browser: Executes JS which requires\nrequesting file data.json
+
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser: data.json
+
+note over browser: When data.json is received\nevent handler triggers and\nrenders content of data.json

@@ -1,0 +1,16 @@
+note over browser: 
+- note object created\nand pushed to array notes
+- list is recreated using redrawNotes
+end note
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa\nJSON: {"content":"spa new note","date":"2020-03-22T20:25:36:058Z"}
+
+note over server:
+Content of POST is pushed to array notes
+end note
+
+server-->browser: HTTP 201\nJSON: {"message":"note created"}
+
+note over browser:
+Content of response is logged to console
+end note
