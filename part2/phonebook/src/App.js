@@ -35,7 +35,6 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState('')
   const [ searchValue, setSearchValue ] = useState('')
 
-  console.log([persons]);
   useEffect(() => {
     axios
       .get('http://localhost:3001/persons')
@@ -62,7 +61,9 @@ const App = () => {
   const handleSearchChange = (event) => setSearchValue(event.target.value);
 
   /* Only show people whose names matches current searchValue */
-  const filteredPersons = persons.filter(person => person.name.includes(searchValue));
+  const filteredPersons = persons.filter(person =>
+    person.name.toLowerCase().includes(searchValue.toLocaleLowerCase())
+  );
   
   return (
     <div>
