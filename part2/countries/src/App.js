@@ -21,7 +21,11 @@ const DetailedCountry = ({country}) => {
   );
 }
 
-const Country = ({country, showHandleClick}) => {
+const Country = ({country, showHandleClick, showDetailed}) => {
+  if (showDetailed === country.name)
+    return (
+      <DetailedCountry country={country} />
+    );
   return (
     <div>
       {country.name}
@@ -32,11 +36,11 @@ const Country = ({country, showHandleClick}) => {
   );
 }
 
-const Countries = ({countries, showHandleClick}) => {
+const Countries = ({countries, showHandleClick, showDetailed}) => {
   if (countries.length > 10)
     return (<div>Too many matches, specify another filter</div>);
   else if (countries.length > 1)
-    return countries.map(country => <Country country={country} showHandleClick={showHandleClick} key={country.alpha3Code} />);
+    return countries.map(country => <Country country={country} showHandleClick={showHandleClick} key={country.alpha3Code} showDetailed={showDetailed} />);
   else if (countries.length === 1)
     return <DetailedCountry country={countries[0]} />
   return null;
@@ -45,6 +49,7 @@ const Countries = ({countries, showHandleClick}) => {
 function App() {
   const [ countries, setCountries ] = useState([]);
   const [ searchString, setSearchString ] = useState('');
+  const [ showDetailed, setShowDetailed ] = useState('');
 
   useEffect(() => {
     axios
@@ -57,16 +62,24 @@ function App() {
   );
 
   const showHandleClick = event => {
-    setSearchString(event.target.id);
+    setShowDetailed(event.target.id);
+  }
+  const searchHandleChange = event => {
+    setSearchString(event.target.value);
+    setShowDetailed('');
   }
 
   return (
     <div>
       <div>
         find countries
-        <input value={searchString} onChange={event => setSearchString(event.target.value)} />
+        <input value={searchString} onChange={searchHandleChange} />
       </div>
-      <Countries countries={filteredCountries} showHandleClick={showHandleClick} />
+      <Countries
+        countries={filteredCountries}
+        showHandleClick={showHandleClick}
+        showDetailed={showDetailed}
+      />
     </div>
   );
 }
