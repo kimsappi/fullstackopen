@@ -8,7 +8,39 @@ const Languages = ({languages}) => {
   );
 }
 
+const Weather = ({weather}) => {
+  if (!weather || Object.keys(weather).length === 0)
+    return null;
+  else
+    return (
+      <>
+      <h3>Weather</h3>
+      <p>{weather.weather_state_name}</p>
+      <p>{weather.the_temp.toFixed(1)} &deg;C</p>
+      <p>Wind: {weather.wind_speed.toFixed(1)} mph {weather.wind_direction_compass}</p>
+      </>
+    );
+}
+
 const DetailedCountry = ({country}) => {
+  const [ weather, setWeather ] = useState({});
+
+  useEffect(() => {
+    axios
+      .get('https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/search/?query='.concat(country.capital))
+      .then(response => {
+        if (response.data.length === 0)
+          return;
+        axios
+          .get('https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/'.concat(response.data[0].woeid))
+          .then(response => {
+            if (response.data.length === 0)
+              return;
+            setWeather(response.data.consolidated_weather[0]);
+          });
+      });
+  }, [country]);
+
   return (
     <div>
       <h2>{country.name}</h2>
@@ -17,6 +49,7 @@ const DetailedCountry = ({country}) => {
       <h3>languages</h3>
       <Languages languages={country.languages} />
       <img src={country.flag} alt={`Flag of ${country.name}`} height="70" />
+      <Weather weather={weather} />
     </div>
   );
 }
