@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import phonebookDbActions from './services/phonebookDbActions';
 
-const Number = ({entry}) => {
-  return(
+const Number = ({entry, deleteClickHandler}) => {
+  return (
     <div>
-      {entry.name} {entry.number}
+      {entry.name} {entry.number} <button onClick={deleteClickHandler}>delete</button>
     </div>
   );
 }
 
-const Numbers = (props) => {
-  return (props.data.map(entry => <Number entry={entry} key={entry.name} />));
+const Numbers = ({data, deleteClickHandler}) => {
+  return (data.map(entry =>
+    <Number
+      entry={entry}
+      key={entry.id}
+      deleteClickHandler={() => deleteClickHandler(entry.id)}
+    />));
 }
 
 const NumberForm = (props) => {
-  return(
+  return (
     <form onSubmit={props.addNumber}>
         <div>
           name: <input value={props.newName} onChange={props.handleNameChange} />
@@ -36,23 +41,50 @@ const App = () => {
   const [ searchValue, setSearchValue ] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => setPersons(response.data));
+    phonebookDbActions
+      .getNumbers()
+      .then(numbers => setPersons(numbers));
   }, []);
 
   /* Check if name exists, add new number */
   const addNumber = (event) => {
     event.preventDefault();
-    const nameExists = persons.filter(entry => entry.name === newName);
-    if (nameExists.length !== 0)
-      alert(`${newName} is already added to the phonebook`);
+    const newNumberObject = {name: newName, number: newNumber};
+    const nameExists = persons.filter(entry =>
+      entry.name.toLowerCase() === newName.toLowerCase());
+    if (nameExists.length !== 0) {
+      phonebookDbActions
+        .updateNumber(newNumberObject, nameExists[0].id)
+        .then(response => {
+          const newPersons = persons.map(person =>
+            person.id === nameExists[0].id ? response : person);
+          setPersons(newPersons);
+        });
+    }
     else {
-      const newPersons = persons.concat({name: newName, number: newNumber});
-      setPersons(newPersons);
+      phonebookDbActions
+        .postNumber(newNumberObject)
+        .then(data => {
+          const newPersons = persons.concat(data);
+          setPersons(newPersons);
+        }
+      );
     }
     setNewName('');
     setNewNumber('');
+  }
+
+  /* Function for deleting a number */
+  const deleteClickHandler = id => {
+    const personToBeDeleted = persons.filter(person => person.id === id);
+    if (personToBeDeleted.length > 0 &&
+      window.confirm(`Delete ${personToBeDeleted[0].name} ?`))
+    {
+        phonebookDbActions
+          .deleteNumber(id);
+        const newPersons = persons.filter(person => person.id !== id);
+        setPersons(newPersons);
+    }
   }
 
   /* Event handlers for updating stateful inputs */
@@ -62,7 +94,7 @@ const App = () => {
 
   /* Only show people whose names matches current searchValue */
   const filteredPersons = persons.filter(person =>
-    person.name.toLowerCase().includes(searchValue.toLocaleLowerCase())
+    person.name.toLowerCase().includes(searchValue.toLowerCase())
   );
   
   return (
@@ -81,7 +113,7 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Numbers data={filteredPersons} />
+      <Numbers data={filteredPersons} deleteClickHandler={deleteClickHandler} />
     </div>
   )
 }
