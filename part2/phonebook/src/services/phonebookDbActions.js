@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'http://192.168.48.128:3001/persons';
+const baseUrl = 'http://localhost:3001/persons';
 
 const getNumbers = () => {
 	const request = axios.get(baseUrl);

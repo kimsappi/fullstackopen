@@ -46,13 +46,16 @@ const App = () => {
       .then(numbers => setPersons(numbers));
   }, []);
 
-  /* Check if name exists, add new number */
+  /* Check if name exists, add/update number */
   const addNumber = (event) => {
     event.preventDefault();
     const newNumberObject = {name: newName, number: newNumber};
     const nameExists = persons.filter(entry =>
       entry.name.toLowerCase() === newName.toLowerCase());
-    if (nameExists.length !== 0) {
+    if (nameExists.length !== 0 &&
+      window.confirm(`${nameExists[0].name} is already added to phonebook, replace the old number with a new one?`)
+      )
+    {
       phonebookDbActions
         .updateNumber(newNumberObject, nameExists[0].id)
         .then(response => {
@@ -61,7 +64,7 @@ const App = () => {
           setPersons(newPersons);
         });
     }
-    else {
+    else if (nameExists.length === 0) {
       phonebookDbActions
         .postNumber(newNumberObject)
         .then(data => {
