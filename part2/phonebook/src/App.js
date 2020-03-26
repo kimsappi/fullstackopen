@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import phonebookDbActions from './services/phonebookDbActions';
+import './index.css';
 
 const Number = ({entry, deleteClickHandler}) => {
   return (
@@ -34,17 +35,34 @@ const NumberForm = (props) => {
   );
 }
 
+const StatusMessage = ({status}) => {
+  if (Object.keys(status).length === 0)
+    return null;
+  const classes = status.error ? 'status error' : 'status';
+  return (
+    <div className={classes}>{status.message}</div>
+  );
+}
+
 const App = () => {
-  const [ persons, setPersons ] = useState([])
-  const [ newName, setNewName ] = useState('')
-  const [ newNumber, setNewNumber ] = useState('')
-  const [ searchValue, setSearchValue ] = useState('')
+  const [ persons, setPersons ] = useState([]);
+  const [ newName, setNewName ] = useState('');
+  const [ newNumber, setNewNumber ] = useState('');
+  const [ searchValue, setSearchValue ] = useState('');
+  const [ statusMessage, setStatusMessage ] = useState({});
 
   useEffect(() => {
     phonebookDbActions
       .getNumbers()
       .then(numbers => setPersons(numbers));
   }, []);
+
+  /* Function that handles setting and removing status message automatically */
+  const setStatus = (message, error) => {
+    const statusObject = {message: message, error: error};
+    setStatusMessage(statusObject);
+    setTimeout(() => setStatusMessage({}), 3000);
+  }
 
   /* Check if name exists, add/update number */
   const addNumber = (event) => {
@@ -62,6 +80,7 @@ const App = () => {
           const newPersons = persons.map(person =>
             person.id === nameExists[0].id ? response : person);
           setPersons(newPersons);
+          setStatus(`Updated ${newName}`, false);
         });
     }
     else if (nameExists.length === 0) {
@@ -70,6 +89,7 @@ const App = () => {
         .then(data => {
           const newPersons = persons.concat(data);
           setPersons(newPersons);
+          setStatus(`Added ${newName}`, false);
         }
       );
     }
@@ -84,7 +104,9 @@ const App = () => {
       window.confirm(`Delete ${personToBeDeleted[0].name} ?`))
     {
         phonebookDbActions
-          .deleteNumber(id);
+          .deleteNumber(id)
+          .then(setStatus(`Deleted ${personToBeDeleted[0].name}`, false))
+          .catch(() => setStatus(`Information of ${personToBeDeleted[0].name} has already been removed from server`, true));
         const newPersons = persons.filter(person => person.id !== id);
         setPersons(newPersons);
     }
@@ -103,6 +125,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <StatusMessage status={statusMessage} />
       <div>
         Filter shown entries with
         <input value={searchValue} onChange={handleSearchChange} />
