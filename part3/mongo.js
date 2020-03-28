@@ -6,7 +6,6 @@ if (process.argv.length < 3) {
 	process.exit(1);
 }
 
-const dbPassword = process.argv[2];
 const dbUrl = process.env.MONGODB_URI;
 
 mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -26,7 +25,7 @@ if (process.argv.length === 3) {
 			result.forEach(person =>
 				console.log(`${person.name} ${person.number}`));
 			mongoose.connection.close();
-		})
+		});
 }
 
 if (process.argv.length === 5) {

@@ -70,18 +70,19 @@ const App = () => {
     const newNumberObject = {name: newName, number: newNumber};
     const nameExists = persons.filter(entry =>
       entry.name.toLowerCase() === newName.toLowerCase());
-    if (nameExists.length !== 0 &&
-      window.confirm(`${nameExists[0].name} is already added to phonebook, replace the old number with a new one?`)
-      )
+    if (
+        nameExists.length !== 0 &&
+        window.confirm(`${nameExists[0].name} is already added to phonebook, replace the old number with a new one?`)
+    )
     {
       phonebookDbActions
         .updateNumber(newNumberObject, nameExists[0].id)
         .then(response => {
-          const newPersons = persons.map(person =>
-            person.id === nameExists[0].id ? response : person);
+          const newPersons = persons.map(person => person.id === response.id ? response : person);
           setPersons(newPersons);
           setStatus(`Updated ${newName}`, false);
-        });
+        })
+        .catch(error => setStatus(error.response.data.error, true));
     }
     else if (nameExists.length === 0) {
       phonebookDbActions
@@ -90,8 +91,8 @@ const App = () => {
           const newPersons = persons.concat(data);
           setPersons(newPersons);
           setStatus(`Added ${newName}`, false);
-        }
-      );
+        })
+        .catch(error => setStatus(error.response.data.error, true));
     }
     setNewName('');
     setNewNumber('');

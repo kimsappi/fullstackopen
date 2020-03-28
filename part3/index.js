@@ -21,6 +21,8 @@ app.use(morgan(function (tokens, req, res) {
 }));
 
 /* Routes */
+
+// Return all entries
 app.get('/api/persons', (req, res) => {
 	Person
 		.find({})
@@ -29,16 +31,13 @@ app.get('/api/persons', (req, res) => {
 		});
 });
 
-app.post('/api/persons', (req, res) => {
-	const newPerson = req.body;
-	for (let field of [newPerson.name, newPerson.number]) {
-		if (typeof field === 'undefined' || !field.toString().length)
-			return res.status(400).json({ error: 'name or number missing from request' });
-	};
-	const newPersonModel = new Person(newPerson);
+// Post new entry
+app.post('/api/persons', (req, res, next) => {
+	const newPersonModel = new Person(req.body);
 	newPersonModel
 		.save()
-		.then(response => res.json(response.toJSON()));
+		.then(response => res.json(response.toJSON()))
+		.catch(error => next(error));
 	/*if (persons.find(entry => entry.name.toLowerCase() === newPerson.name.toLowerCase())) {
 		return res.status(400).json({error: 'name must be unique'}).end();}
 	do {
@@ -49,6 +48,7 @@ app.post('/api/persons', (req, res) => {
 	res.json(newPersonWithId);*/
 });
 
+// Get single entry by id
 app.get('/api/persons/:id', (req, res, next) => {
 	Person
 		.findById(req.params.id)
@@ -56,34 +56,62 @@ app.get('/api/persons/:id', (req, res, next) => {
 		.catch(error => next(error));
 });
 
+// Delete single entry by id
 app.delete('/api/persons/:id', (req, res, next) => {
 	Person
-		.findByIdAndRemove(req.params.id)
-		.then(result => res.status(204).end())
+		.findByIdAndDelete(req.params.id)
+		.then(result => res.send(result.toJSON()))
 		.catch(error => next(error));
-})
+});
 
+// Update old entry with new number
+app.put('/api/persons/:id', (req, res, next) => {
+	Person
+		.findByIdAndUpdate(req.params.id,
+			{number: req.body.number},
+			{runValidators: true})
+		.then(response => {
+			response.number = req.body.number;
+			return res.send(response.toJSON());
+		})
+		.catch(error => next(error));
+});
+
+// Return basic info about state of service
 app.get('/info', (req, res) => {
 	const datetime = new Date();
 	res.header('Content-Type', 'text/html');
-	const html = `Phonebook has info for ${persons.length} people<br><br>${datetime}`;
-	res.send(html);
+	Person
+		.find({})
+		.then(persons => {
+			const html = `Phonebook has info for ${persons.length} people<br><br>${datetime}`;
+			return res.send(html);
+		});
 });
 
-const PORT = 3001;
-const IP = '0.0.0.0'; // TODO remove for final submission
-app.listen(PORT, IP, () => {
-	console.log(`Server running on port ${PORT}`)
-});
+/* Error handling & 404 */
+const unknownEndpoint = (request, response) => {
+	response.status(404).send({error: 'unknown endpoint'});
+};
 
 const errorHandler = (error, request, response, next) => {
 	console.error(error.message);
 
 	if (error.name === 'CastError' && error.kind === 'ObjectId') {
-		return response.status(400).send({ error: 'malformatted id' });
+		return response.status(400).json({ error: 'malformatted id' });
+	}
+	if (error.name === 'ValidationError') {
+		return response.status(400).json({ error: error.message });
 	}
 
 	next(error);
-}
+};
 
+app.use(unknownEndpoint);
 app.use(errorHandler);
+
+const PORT = 3001;
+const IP = '0.0.0.0'; // TODO remove for final submission
+app.listen(PORT, IP, () => {
+	console.log(`Server running on port ${PORT}`);
+});
