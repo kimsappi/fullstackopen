@@ -25,7 +25,7 @@ describe('Testing blogs with initial blogs in the DB', () => {
 	});
 
 	describe('Creating a new blog', () => {
-		test('Adding a valid blog', async () => {
+		test('Adding a blog with complete data', async () => {
 			const newBlog = {author: 'me', title: 'Sent in API test', url: 'http://localhost', likes: 42};
 			const response = await api
 				.post('/api/blogs')
@@ -38,6 +38,30 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			expect(newBlogs).toHaveLength(testHelper.initBlogs.length + 1);
 			const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
 			expect(newBlogsWithoutMongoData).toContainEqual(newBlog);
+		});
+
+		test('Adding a blog with missing likes', async () => {
+			const newBlog = {author: 'me', title: 'Sent in API test', url: 'http://localhost'};
+			const response = await api
+				.post('/api/blogs')
+				.send(newBlog)
+				.expect(201)
+				.expect('Content-Type', /application\/json/);
+
+			const newBlogs = await testHelper.getBlogs();
+
+			expect(newBlogs).toHaveLength(testHelper.initBlogs.length + 1);
+			const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
+			expect(newBlogsWithoutMongoData).toContainEqual({...newBlog, likes: 0});
+		});
+
+		test('Adding a blog with missing title and url', async () => {
+			const newBlog = {author: 'me', likes: 5};
+			const response = await api
+				.post('/api/blogs')
+				.send(newBlog)
+				.expect(400)
+				.expect('Content-Type', /application\/json/);
 		});
 	});
 
