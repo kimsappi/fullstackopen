@@ -1,10 +1,16 @@
 const blogsRouter = require('express').Router();
 const Blog = require('../models/Blog');
+const User = require('../models/User');
 
 blogsRouter.get('/', async (request, response) => {
-	const blogs = await Blog.find({});
-	response.json(blogs);
+	const blogs = await Blog.find({}).populate('user', {name: 1, username: 1, id: 1});
+	response.status(200).json(blogs);
 });
+
+const getUser = async () => {
+	const user = await User.findOne({});
+	return user;
+};
 
 blogsRouter.post('/', async (request, response) => {
 	// Technically the subject wanted missing title AND URL, but...
@@ -14,9 +20,23 @@ blogsRouter.post('/', async (request, response) => {
 
 	if (typeof request.body.likes === 'undefined')
 		request.body.likes = 0
-	const blog = new Blog(request.body);
 
+	// Getting random user (for now)
+	const user = await getUser();
+
+	const blog = new Blog({
+		title: request.body.title,
+		url: request.body.url,
+		author: request.body.author,
+		likes: request.body.likes,
+		user: user['_id']
+	});
 	const result = await blog.save();
+	
+	// Associating new blog with user
+	user.blogs = user.blogs.concat(result['_id']);
+	const userResult = await user.save();
+	
 	response.status(201).json(result);
 });
 

@@ -36,7 +36,7 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			const newBlogs = await testHelper.getBlogs();
 
 			expect(newBlogs).toHaveLength(testHelper.initBlogs.length + 1);
-			const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
+			const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id', 'user']));
 			expect(newBlogsWithoutMongoData).toContainEqual(newBlog);
 		});
 
@@ -51,7 +51,7 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			const newBlogs = await testHelper.getBlogs();
 
 			expect(newBlogs).toHaveLength(testHelper.initBlogs.length + 1);
-			const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
+			const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id', 'user']));
 			expect(newBlogsWithoutMongoData).toContainEqual({...newBlog, likes: 0});
 		});
 

@@ -5,6 +5,7 @@ const _ = require('lodash');
 const app = require('../app');
 const User = require('../models/User');
 const testHelper = require('./testHelper');
+const Blog = require('../models/Blog');
 
 const api = supertest(app);
 
@@ -36,7 +37,7 @@ describe('Testing user functions', () => {
 			const newUsers = await testHelper.getUsers();
 
 			expect(newUsers).toHaveLength(testHelper.initUsers.length + 1);
-			const newUsersWithoutMongoData = newUsers.map(user => _.omit(user, ['id', '__v', '_id', 'password']));
+			const newUsersWithoutMongoData = newUsers.map(user => _.omit(user, ['id', '__v', '_id', 'password', 'blogs']));
 			delete newUser.password;
 			expect(newUsersWithoutMongoData).toContainEqual(newUser);
 		});
@@ -52,7 +53,7 @@ describe('Testing user functions', () => {
 			const newUsers = await testHelper.getUsers();
 
 			expect(newUsers).toHaveLength(testHelper.initUsers.length);
-			const newUsersWithoutMongoData = newUsers.map(user => _.omit(user, ['id', '__v', '_id', 'password']));
+			const newUsersWithoutMongoData = newUsers.map(user => _.omit(user, ['id', '__v', '_id', 'password', 'blogs']));
 			delete newUser.password;
 			expect(newUsersWithoutMongoData).not.toContainEqual(newUser);
 		});
@@ -106,11 +107,14 @@ describe('Testing user functions', () => {
 	beforeEach(async () => {
 		// Clean database
 		await User.deleteMany({});
+		await Blog.deleteMany({});
 
 		// Initialise database with the same users every time
 		const users = testHelper.initUsers.map(user => new User(user));
 		const savePromises = users.map(user => user.save());
-		await Promise.all(savePromises);
+		const blogs = testHelper.initBlogs.map(blog => new Blog(blog));
+		const saveBlogs = blogs.map(blog => blog.save());
+		await Promise.all([...savePromises, ...saveBlogs]);
 	});
 
 	afterAll(() => mongoose.connection.close());
