@@ -19,8 +19,13 @@ usersRouter.post('/', async (request, response) => {
 
 	const user = new User({...request.body, password: await bcrypt.hash(request.body.password, 10)});
 
-	const result = await user.save();
-	response.status(201).json(result);
+	try {
+		const result = await user.save();
+		response.status(201).json(result);
+	}
+	catch (ValidationError) {
+		return response.status(400).json('Username must be unique');
+	}
 });
 
 module.exports = usersRouter;

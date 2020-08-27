@@ -9,14 +9,14 @@ const testHelper = require('./testHelper');
 const api = supertest(app);
 
 describe('Testing user functions', () => {
-	// test('Correct number of notes returned as JSON', async () => {
-	// 	const response = await api
-	// 		.get('/api/users')
-	// 		.expect(200)
-	// 		.expect('Content-Type', /application\/json/);
+	test('Correct number of users returned as JSON', async () => {
+		const response = await api
+			.get('/api/users')
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
 			
-	// 	expect(response.body).toHaveLength(testHelper.initusers.length);
-	// });
+		expect(response.body).toHaveLength(testHelper.initUsers.length);
+	});
 
 	// test('There is a field named id', async () => {
 	// 	const response = await api.get('/api/users');
@@ -57,14 +57,14 @@ describe('Testing user functions', () => {
 			expect(newUsersWithoutMongoData).not.toContainEqual(newUser);
 		});
 
-		// test('Adding a user with missing title and url', async () => {
-		// 	const newUser = {author: 'me', likes: 5};
-		// 	const response = await api
-		// 		.post('/api/users')
-		// 		.send(newUser)
-		// 		.expect(400)
-		// 		.expect('Content-Type', /application\/json/);
-		// });
+		test('Adding a user with an existing name', async () => {
+			const newUser = testHelper.initUsers[0];
+			const response = await api
+				.post('/api/users')
+				.send(newUser)
+				.expect(400)
+				.expect('Content-Type', /application\/json/);
+		});
 	});
 
 	// test('Deleting a user', async () => {
