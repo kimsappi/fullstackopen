@@ -65,6 +65,42 @@ describe('Testing blogs with initial blogs in the DB', () => {
 		});
 	});
 
+	test('Deleting a blog', async () => {
+		const blogsAtBeginning = await testHelper.getBlogs();
+		const blogToBeDeleted = blogsAtBeginning[0];
+		const response = await api
+			.delete(`/api/blogs/${blogToBeDeleted.id}`)
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		const newBlogs = await testHelper.getBlogs();
+
+		expect(newBlogs).toHaveLength(blogsAtBeginning.length - 1);
+		const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
+		expect(newBlogsWithoutMongoData).not.toContainEqual(blogToBeDeleted);
+	});
+
+	test('Updating a blog', async () => {
+		const blogsAtBeginning = await testHelper.getBlogs();
+		const updatedBlog = blogsAtBeginning[0];
+		const updatedData = {author: 'TestAuthor', likes: 997};
+		const response = await api
+			.patch(`/api/blogs/${updatedBlog.id}`)
+			.send(updatedData)
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		const newBlogs = await testHelper.getBlogs();
+
+		expect(newBlogs).toHaveLength(blogsAtBeginning.length);
+		const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
+		expect(newBlogsWithoutMongoData).not.toContainEqual(updatedBlog);
+		expect(newBlogsWithoutMongoData).toContainEqual(_.omit(
+			{...updatedBlog, ...updatedData},
+			['id', '__v', '_id']
+		));
+	});
+
 	beforeEach(async () => {
 		// Clean database
 		await Blog.deleteMany({});
