@@ -8,6 +8,24 @@ const testHelper = require('./testHelper');
 
 const api = supertest(app);
 
+let token = '';
+
+test('Posting a blog without logging in', async () => {
+	const newBlog = {author: 'me', title: 'Sent in API test', url: 'http://localhost', likes: 42};
+	const response = await api
+		.post('/api/blogs')
+		.send(newBlog)
+		.set({Authorization: 'bearer ' + ''})
+		.expect(401)
+		.expect('Content-Type', /application\/json/);
+
+	const newBlogs = await testHelper.getBlogs();
+
+	expect(newBlogs).toHaveLength(testHelper.initBlogs.length);
+	const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id', 'user']));
+	expect(newBlogsWithoutMongoData).not.toContainEqual(newBlog);
+});
+
 describe('Testing blogs with initial blogs in the DB', () => {
 	test('Correct number of notes returned as JSON', async () => {
 		const response = await api
@@ -29,6 +47,7 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			const newBlog = {author: 'me', title: 'Sent in API test', url: 'http://localhost', likes: 42};
 			const response = await api
 				.post('/api/blogs')
+				.set({Authorization: 'bearer ' + token})
 				.send(newBlog)
 				.expect(201)
 				.expect('Content-Type', /application\/json/);
@@ -44,6 +63,7 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			const newBlog = {author: 'me', title: 'Sent in API test', url: 'http://localhost'};
 			const response = await api
 				.post('/api/blogs')
+				.set({Authorization: 'bearer ' + token})
 				.send(newBlog)
 				.expect(201)
 				.expect('Content-Type', /application\/json/);
@@ -59,6 +79,7 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			const newBlog = {author: 'me', likes: 5};
 			const response = await api
 				.post('/api/blogs')
+				.set({Authorization: 'bearer ' + token})
 				.send(newBlog)
 				.expect(400)
 				.expect('Content-Type', /application\/json/);
@@ -99,6 +120,18 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			{...updatedBlog, ...updatedData},
 			['id', '__v', '_id']
 		));
+	});
+
+	beforeAll(async () => {
+		const newUser = {username: 'dummy', password: '123', name: 'testUser'};
+
+		const loginRes = await api
+			.post('/api/login')
+			.send(_.omit(newUser, 'name'))
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		token = loginRes.body.token;
 	});
 
 	beforeEach(async () => {

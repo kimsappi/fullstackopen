@@ -7,12 +7,10 @@ blogsRouter.get('/', async (request, response) => {
 	response.status(200).json(blogs);
 });
 
-const getUser = async () => {
-	const user = await User.findOne({});
-	return user;
-};
-
 blogsRouter.post('/', async (request, response) => {
+	if (!request.user)
+		return response.status(401).json('Not logged in');
+
 	// Technically the subject wanted missing title AND URL, but...
 	if (typeof request.body.title === 'undefined' ||
 			typeof request.body.url === 'undefined')
@@ -22,14 +20,14 @@ blogsRouter.post('/', async (request, response) => {
 		request.body.likes = 0
 
 	// Getting random user (for now)
-	const user = await getUser();
+	const user = request.user;
 
 	const blog = new Blog({
 		title: request.body.title,
 		url: request.body.url,
 		author: request.body.author,
 		likes: request.body.likes,
-		user: user['_id']
+		user: user.id
 	});
 	const result = await blog.save();
 	
