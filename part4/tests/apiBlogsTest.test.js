@@ -5,6 +5,7 @@ const _ = require('lodash');
 const app = require('../app');
 const Blog = require('../models/Blog');
 const testHelper = require('./testHelper');
+const { JsonWebTokenError } = require('jsonwebtoken');
 
 const api = supertest(app);
 
@@ -85,20 +86,6 @@ describe('Testing blogs with initial blogs in the DB', () => {
 				.expect('Content-Type', /application\/json/);
 		});
 	});
-
-	test('Deleting a blog', async () => {
-		const blogsAtBeginning = await testHelper.getBlogs();
-		const blogToBeDeleted = blogsAtBeginning[0];
-		const response = await api
-			.delete(`/api/blogs/${blogToBeDeleted.id}`)
-			.expect(200)
-			.expect('Content-Type', /application\/json/);
-
-		const newBlogs = await testHelper.getBlogs();
-
-		expect(newBlogs).toHaveLength(blogsAtBeginning.length - 1);
-		const newBlogsWithoutMongoData = newBlogs.map(blog => _.omit(blog, ['id', '__v', '_id']));
-		expect(newBlogsWithoutMongoData).not.toContainEqual(blogToBeDeleted);
 	});
 
 	test('Updating a blog', async () => {
@@ -120,7 +107,6 @@ describe('Testing blogs with initial blogs in the DB', () => {
 			{...updatedBlog, ...updatedData},
 			['id', '__v', '_id']
 		));
-	});
 
 	beforeAll(async () => {
 		const newUser = {username: 'dummy', password: '123', name: 'testUser'};
@@ -142,7 +128,61 @@ describe('Testing blogs with initial blogs in the DB', () => {
 		const blogs = testHelper.initBlogs.map(blog => new Blog(blog));
 		const savePromises = blogs.map(blog => blog.save());
 		await Promise.all(savePromises);
+
+		jest.useFakeTimers();
 	});
 
 	afterAll(() => mongoose.connection.close());
+});
+
+describe('Deleting a blog', () => {
+	let newBlogId = '';
+	let token = '';
+
+	test('Not logged in', async () => {
+		const blogsAtBeginning = await testHelper.getBlogs();
+		const response = await api
+			.delete(`/api/blogs/${newBlogId}`)
+			.set({Authorization: 'bearer ' + ''})
+			.expect(401)
+			.expect('Content-Type', /application\/json/);
+
+		const newBlogs = await testHelper.getBlogs();
+
+		expect(newBlogs).toHaveLength(blogsAtBeginning.length);
+	});
+
+	test('Logged in', async () => {
+		const blogsAtBeginning = await testHelper.getBlogs();
+		const response = await api
+			.delete(`/api/blogs/${newBlogId}`)
+			.set({Authorization: 'bearer ' + token})
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		const newBlogs = await testHelper.getBlogs();
+
+		expect(newBlogs).toHaveLength(blogsAtBeginning.length - 1);
+	});
+
+	beforeAll(async () => {
+		const newUser = {username: 'dummy', password: '123', name: 'testUser'};
+
+		const loginRes = await api
+			.post('/api/login')
+			.send(_.omit(newUser, 'name'))
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		token = loginRes.body.token;
+
+		const newBlog = {author: 'me', title: 'Sent in deletion test', url: 'http://localhost', likes: 42};
+		const response = await api
+			.post('/api/blogs')
+			.set({Authorization: 'bearer ' + token})
+			.send(newBlog)
+			.expect(201)
+			.expect('Content-Type', /application\/json/);
+		newBlogId = response.body.id;
+	});
 });

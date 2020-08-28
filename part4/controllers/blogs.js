@@ -39,6 +39,10 @@ blogsRouter.post('/', async (request, response) => {
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
+	const blog = await Blog.findById(request.params.id);
+	if (!request.user || blog.user.toString() !== request.user.id.toString())
+		return response.status(401).json('Not authorised to delete this blog');
+
 	const result = await Blog.findByIdAndDelete(request.params.id);
 	response.status(200).json(result);
 });
