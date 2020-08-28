@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 blogsRouter.get('/', async (request, response) => {
 	const blogs = await Blog.find({}).populate('user', {name: 1, username: 1, id: 1});
-	response.status(200).json(blogs);
+	return response.status(200).json(blogs);
 });
 
 blogsRouter.post('/', async (request, response) => {
@@ -35,24 +35,24 @@ blogsRouter.post('/', async (request, response) => {
 	user.blogs = user.blogs.concat(result['_id']);
 	const userResult = await user.save();
 	
-	response.status(201).json(result);
+	return response.status(201).json(result);
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
 	const blog = await Blog.findById(request.params.id);
-	if (!request.user || blog.user.toString() !== request.user.id.toString())
+	if (!request.user || !blog || blog.user.toString() !== request.user.id.toString())
 		return response.status(401).json('Not authorised to delete this blog');
 
 	const result = await Blog.findByIdAndDelete(request.params.id);
-	response.status(200).json(result);
+	return response.status(200).json(result);
 });
 
 blogsRouter.patch('/:id', async (request, response) => {
 	if (!request.body)
-		response.status(400).json('error');
+		return response.status(400).json('error');
 
 	const result = await Blog.findByIdAndUpdate(request.params.id, request.body);
-	response.status(200).json(result);
+	return response.status(200).json(result);
 });
 
 module.exports = blogsRouter;
