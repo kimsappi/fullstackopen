@@ -68,6 +68,42 @@ describe('Testing user functions', () => {
 		});
 	});
 
+	describe('Creating a user and logging in', () => {
+		const newUser = {username: 'dummy', password: '123', name: 'testUser'};
+
+		test('Login with valid user', async () => {
+			const loginRes = await api
+				.post('/api/login')
+				.send(_.omit(newUser, 'name'))
+				.expect(200)
+				.expect('Content-Type', /application\/json/);
+		});
+
+		test('Login with nonexistent user', async () => {
+			const loginRes = await api
+				.post('/api/login')
+				.send({username: '34rtr45yght5rh5', password: '123'})
+				.expect(401)
+				.expect('Content-Type', /application\/json/);
+		});
+
+		test('Login with real user, wrong password', async () => {
+			const loginRes = await api
+				.post('/api/login')
+				.send({username: newUser.username, password: '1234325546aads'})
+				.expect(401)
+				.expect('Content-Type', /application\/json/);
+		});
+
+		beforeEach(async  () => {
+			await api
+				.post('/api/users')
+				.send(newUser)
+				.expect(201)
+				.expect('Content-Type', /application\/json/);
+		});
+	});
+
 	// test('Deleting a user', async () => {
 	// 	const usersAtBeginning = await testHelper.getusers();
 	// 	const userToBeDeleted = usersAtBeginning[0];
