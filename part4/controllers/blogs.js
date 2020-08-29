@@ -12,8 +12,8 @@ blogsRouter.post('/', async (request, response) => {
 		return response.status(401).json('Not logged in');
 
 	// Technically the subject wanted missing title AND URL, but...
-	if (typeof request.body.title === 'undefined' ||
-			typeof request.body.url === 'undefined')
+	if (typeof request.body.title === 'undefined' || request.body.title.length < 1 ||
+			typeof request.body.url === 'undefined' || request.body.url.length < 1)
 		return response.status(400).json(null);
 
 	if (typeof request.body.likes === 'undefined')

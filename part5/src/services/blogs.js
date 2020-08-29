@@ -9,11 +9,15 @@ const getAll = async () => {
 }
 
 const submitNew = async (title, author, url, user) => {
-	const response = await axios.post(baseUrl,
-		{title: title, author: author, url: url},
-		{headers: getAuthHeader(user)}
-	);
-	return {status: response.status, data: response.data};
+	try {
+		const response = await axios.post(baseUrl,
+			{title: title, author: author, url: url},
+			{headers: getAuthHeader(user)}
+		);
+		return {status: response.status, data: response.data};
+	} catch(err) {
+		return {status: 400};
+	}
 }
 
 export {

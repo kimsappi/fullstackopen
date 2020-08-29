@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import InputWithLabel from './InputWithLabel';
 import {submitNew} from '../services/blogs';
 
-const NewBlogInput = ({user, rerenderBlogs, setRerenderBlogs}) => {
+const NewBlogInput = ({user, rerenderBlogs, setRerenderBlogs, notification, setNotification}) => {
 	const [title, setTitle] = useState('');
 	const [author, setAuthor] = useState('');
 	const [url, setUrl] = useState('');
@@ -10,8 +10,12 @@ const NewBlogInput = ({user, rerenderBlogs, setRerenderBlogs}) => {
 	const addNewBlog = async event => {
 		event.preventDefault();
 		const response = await submitNew(title, author, url, user);
-		if (response.status === 201)
+		if (response.status === 201) {
 			setRerenderBlogs(!rerenderBlogs);
+			setNotification('blogSuccess');
+		}
+		else
+			setNotification('blogError');
 	};
 
 	return (

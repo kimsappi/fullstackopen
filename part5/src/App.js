@@ -5,11 +5,13 @@ import * as blogservice from './services/blogs';
 import Login from './components/Login';
 import Blog from './components/Blog';
 import NewBlogInput from './components/NewBlogInput';
+import Notification from './components/Notification';
 
 const App = () => {
 	const [blogs, setBlogs] = useState([])
 	const [user, setUser] = useState(null)
 	const [rerenderBlogs, setRerenderBlogs] = useState(false);
+	const [notification, setNotification] = useState(null);
 
 	useEffect(() => {
 		blogservice.getAll().then(blogs =>
@@ -27,8 +29,12 @@ const App = () => {
 		return (
 			<div>
 				<h2>blogs</h2>
+				<Notification notification={notification} setNotification={setNotification} />
 				<p>{user.username} logged in <button onClick={() => {setUser(null); localStorage.clear();}}>logout</button></p>
-				<NewBlogInput user={user} rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs} />
+				<NewBlogInput user={user}
+					rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs}
+					notification={notification} setNotification={setNotification}
+				/>
 				{blogs.map(blog =>
 					<Blog key={blog.id} blog={blog} />
 				)}
@@ -37,7 +43,12 @@ const App = () => {
 
 	else 
 		return (
-			<Login user={user} setUser={setUser} />
+			<>
+			<Notification notification={notification} setNotification={setNotification} />
+			<Login user={user} setUser={setUser}
+				notification={notification} setNotification={setNotification}
+			/>
+			</>
 		);
 }
 

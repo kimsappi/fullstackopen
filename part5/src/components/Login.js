@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {submitLogin} from '../services/login';
 
-const Login = ({ user, setUser }) => {
+const Login = ({ user, setUser, notification, setNotification }) => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 
@@ -12,10 +12,16 @@ const Login = ({ user, setUser }) => {
 	const handleLogin = async event => {
 		event.preventDefault();
 		const res = await submitLogin(username, password);
-		if (res.status === 200) {
+		console.log(res);
+		if (res && res.status === 200) {
 			setUser(res.data);
 			console.log(res.data);
 			localStorage.setItem('user', JSON.stringify(res.data));
+			setNotification('loginSuccess');
+		}
+		else {
+			setNotification('loginError');
+			console.log(notification);
 		}
 	};
 
