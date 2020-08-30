@@ -1,10 +1,10 @@
-import React, {useState} from 'react'
-import {submitLike, deleteBlog} from '../services/blogs';
+import React, { useState } from 'react';
+import { submitLike, deleteBlog } from '../services/blogs';
 
-const BlogDetails = ({blog, user, rerenderBlogs, setRerenderBlogs}) => {
+const BlogDetails = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   const checkDeletion = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
-      deleteBlog(blog.id, user, rerenderBlogs, setRerenderBlogs)
+      deleteBlog(blog.id, user, rerenderBlogs, setRerenderBlogs);
   };
 
   return(
@@ -15,14 +15,14 @@ const BlogDetails = ({blog, user, rerenderBlogs, setRerenderBlogs}) => {
       {user.id === blog.user.id && <button onClick={checkDeletion}>remove</button>}
     </>
   );
-}
+};
 
 const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   const [expanded, setExpanded] = useState(false);
 
-	const toggleExpansion = () => {
-		setExpanded(!expanded);
-	}
+  const toggleExpansion = () => {
+    setExpanded(!expanded);
+  };
 
   const blogStyle = {
     border: '2px solid black',
@@ -38,4 +38,4 @@ const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   );
 };
 
-export default Blog
+export default Blog;

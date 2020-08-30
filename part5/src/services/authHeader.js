@@ -1,5 +1,5 @@
 const getAuthHeader = user => {
-	return {Authorization: 'bearer ' + user.token};
+  return { Authorization: 'bearer ' + user.token };
 };
 
 export default getAuthHeader;
