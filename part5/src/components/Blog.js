@@ -1,14 +1,15 @@
 import React, {useState} from 'react'
+import {submitLike} from '../services/blogs';
 
-const BlogDetails = ({blog}) => (
+const BlogDetails = ({blog, user, rerenderBlogs, setRerenderBlogs}) => (
   <>
   <div>{blog.url}</div>
-  <div>{blog.likes} <button>like</button></div>
-  <div>{blog.user.username}</div>
+  <div>{blog.likes} <button onClick={() => submitLike(blog, user, rerenderBlogs, setRerenderBlogs)}>like</button></div>
+  <div>{blog.user.name}</div>
   </>
 );
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   const [expanded, setExpanded] = useState(false);
 
 	const toggleExpansion = () => {
@@ -24,7 +25,7 @@ const Blog = ({ blog }) => {
   return (
     <div style={blogStyle}>
       {blog.title} {blog.author} <button onClick={toggleExpansion}>{expanded ? 'hide' : 'view'}</button>
-      {expanded && <BlogDetails blog={blog} />}
+      {expanded && <BlogDetails blog={blog} user={user} rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs} />}
     </div>
   );
 };

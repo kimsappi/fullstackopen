@@ -20,7 +20,26 @@ const submitNew = async (title, author, url, user) => {
 	}
 }
 
+const submitLike = async (blog, user, rerenderBlogs, setRerenderBlogs) => {
+	try {
+		const response = await axios.put(baseUrl + '/' + blog.id,
+			{
+				user: blog.user.id,
+				likes: blog.likes + 1,
+				author: blog.author,
+				title: blog.title,
+				url: blog.url
+			},
+			{headers: getAuthHeader(user)});
+		setRerenderBlogs(!rerenderBlogs)
+		return {status: response.status, data: response.data};
+	} catch(err) {
+		return {status: 400};
+	}
+};
+
 export {
 	getAll,
-	submitNew
+	submitNew,
+	submitLike
 }

@@ -47,9 +47,22 @@ blogsRouter.delete('/:id', async (request, response) => {
 	return response.status(200).json(result);
 });
 
+// Originally thought PATCH would make more sense than PUT, but
+// ex 5.7 wants PUT
 blogsRouter.patch('/:id', async (request, response) => {
 	if (!request.body)
 		return response.status(400).json('error');
+
+	const result = await Blog.findByIdAndUpdate(request.params.id, request.body);
+	return response.status(200).json(result);
+});
+
+blogsRouter.put('/:id', async (request, response) => {
+	if (!request.body)
+		return response.status(400).json('error');
+	
+	if (!request.user)
+		return response.status(401).json('not logged in');
 
 	const result = await Blog.findByIdAndUpdate(request.params.id, request.body);
 	return response.status(200).json(result);
