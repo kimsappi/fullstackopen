@@ -1,13 +1,21 @@
 import React, {useState} from 'react'
-import {submitLike} from '../services/blogs';
+import {submitLike, deleteBlog} from '../services/blogs';
 
-const BlogDetails = ({blog, user, rerenderBlogs, setRerenderBlogs}) => (
-  <>
-  <div>{blog.url}</div>
-  <div>{blog.likes} <button onClick={() => submitLike(blog, user, rerenderBlogs, setRerenderBlogs)}>like</button></div>
-  <div>{blog.user.name}</div>
-  </>
-);
+const BlogDetails = ({blog, user, rerenderBlogs, setRerenderBlogs}) => {
+  const checkDeletion = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
+      deleteBlog(blog.id, user, rerenderBlogs, setRerenderBlogs)
+  };
+
+  return(
+    <>
+      <div>{blog.url}</div>
+      <div>{blog.likes} <button onClick={() => submitLike(blog, user, rerenderBlogs, setRerenderBlogs)}>like</button></div>
+      <div>{blog.user.name}</div>
+      {user.id === blog.user.id && <button onClick={checkDeletion}>remove</button>}
+    </>
+  );
+}
 
 const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   const [expanded, setExpanded] = useState(false);

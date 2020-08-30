@@ -20,6 +20,17 @@ const submitNew = async (title, author, url, user) => {
 	}
 }
 
+const deleteBlog = async (id, user, rerenderBlogs, setRerenderBlogs) => {
+	try {
+		const response = await axios.delete(baseUrl + '/' + id, {headers: getAuthHeader(user)});
+
+		if (response.status === 200)
+			setRerenderBlogs(!rerenderBlogs);
+	} catch(err) {
+		console.error(err);
+	}
+};
+
 const submitLike = async (blog, user, rerenderBlogs, setRerenderBlogs) => {
 	try {
 		const response = await axios.put(baseUrl + '/' + blog.id,
@@ -31,7 +42,8 @@ const submitLike = async (blog, user, rerenderBlogs, setRerenderBlogs) => {
 				url: blog.url
 			},
 			{headers: getAuthHeader(user)});
-		setRerenderBlogs(!rerenderBlogs)
+		if (response.status === 200)
+			setRerenderBlogs(!rerenderBlogs);
 		return {status: response.status, data: response.data};
 	} catch(err) {
 		return {status: 400};
@@ -41,5 +53,6 @@ const submitLike = async (blog, user, rerenderBlogs, setRerenderBlogs) => {
 export {
 	getAll,
 	submitNew,
-	submitLike
+	submitLike,
+	deleteBlog
 }
