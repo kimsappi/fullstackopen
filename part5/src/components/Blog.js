@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { submitLike, deleteBlog } from '../services/blogs';
+import { deleteBlog } from '../services/blogs';
 
-const BlogDetails = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
+const BlogDetails = ({ blog, user, rerenderBlogs, setRerenderBlogs, submitLike }) => {
   const checkDeletion = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`))
       deleteBlog(blog.id, user, rerenderBlogs, setRerenderBlogs);
@@ -10,14 +10,14 @@ const BlogDetails = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   return(
     <div className='blogDetails'>
       <div>{blog.url}</div>
-      <div>{blog.likes} <button onClick={() => submitLike(blog, user, rerenderBlogs, setRerenderBlogs)}>like</button></div>
+      <div>{blog.likes} <button className='likeButton' onClick={() => submitLike(blog, user, rerenderBlogs, setRerenderBlogs)}>like</button></div>
       <div>{blog.user.name}</div>
       {user.id === blog.user.id && <button onClick={checkDeletion}>remove</button>}
     </div>
   );
 };
 
-const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
+const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs, submitLike }) => {
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpansion = () => {
@@ -33,9 +33,9 @@ const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   return (
     <div style={blogStyle}>
       <div className='blogSummary'>
-        {blog.title} {blog.author} <button onClick={toggleExpansion}>{expanded ? 'hide' : 'view'}</button>
+        {blog.title} {blog.author} <button className='blogExpansionButton' onClick={toggleExpansion}>{expanded ? 'hide' : 'view'}</button>
       </div>
-      {expanded && <BlogDetails blog={blog} user={user} rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs} />}
+      {expanded && <BlogDetails blog={blog} user={user} rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs} submitLike={submitLike} />}
     </div>
   );
 };

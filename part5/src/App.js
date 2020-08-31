@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import * as blogservice from './services/blogs';
+import addNewBlog from './utils/addNewBlog';
 
 import Login from './components/Login';
 import Blog from './components/Blog';
@@ -36,14 +37,14 @@ const App = () => {
         <Notification notification={notification} setNotification={setNotification} />
         <p>{user.username} logged in <button onClick={() => {setUser(null); localStorage.clear();}}>logout</button></p>
         <Togglable ref={createFormRef} buttonLabel='new blog'>
-          <NewBlogInput user={user}
+          <NewBlogInput user={user} addNewBlog={addNewBlog}
             rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs}
             notification={notification} setNotification={setNotification}
             toggleRef={createFormRef}
           />
         </Togglable>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} user={user}
+          <Blog key={blog.id} blog={blog} user={user} submitLike={blogservice.submitLike}
             rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs}
           />
         )}
