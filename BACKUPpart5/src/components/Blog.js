@@ -8,7 +8,7 @@ const BlogDetails = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
   };
 
   return(
-    <div className='blogDetails'>
+    <div class='blogDetails'>
       <div>{blog.url}</div>
       <div>{blog.likes} <button onClick={() => submitLike(blog, user, rerenderBlogs, setRerenderBlogs)}>like</button></div>
       <div>{blog.user.name}</div>
@@ -32,7 +32,7 @@ const Blog = ({ blog, user, rerenderBlogs, setRerenderBlogs }) => {
 
   return (
     <div style={blogStyle}>
-      <div className='blogSummary'>
+      <div class='blogSummary'>
         {blog.title} {blog.author} <button onClick={toggleExpansion}>{expanded ? 'hide' : 'view'}</button>
       </div>
       {expanded && <BlogDetails blog={blog} user={user} rerenderBlogs={rerenderBlogs} setRerenderBlogs={setRerenderBlogs} />}
