@@ -1,4 +1,5 @@
 import axios from 'axios'
+import AnecdoteList from '../components/AnecdoteList'
 
 const baseUrl = 'http://localhost:3001/anecdotes'
 
@@ -9,5 +10,12 @@ export const getAll = async () => {
 
 export const saveAnecdote = async anecdote => {
   const response = await axios.post(baseUrl, anecdote)
+  return response
+}
+
+export const voteAnecdote = async anecdote => {
+  const response = await axios.patch(baseUrl + '/' + anecdote.id, {
+    votes: anecdote.votes + 1
+  })
   return response
 }
