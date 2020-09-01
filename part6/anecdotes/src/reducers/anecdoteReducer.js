@@ -1,3 +1,5 @@
+import * as anecdotesService from '../services/anecdotes'
+
 // const anecdotesAtStart = [
 //   'If it hurts, do it more often',
 //   'Adding manpower to a late software project makes it later!',
@@ -33,10 +35,13 @@ export const createNewAnecdote = content => {
   }
 }
 
-export const initialiseAnecdotes = anecdotes => {
-  return {
-    type: 'INITIALISE_ANECDOTES',
-    data: anecdotes
+export const initialiseAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdotesService.getAll()
+    dispatch({
+      type: 'INITIALISE_ANECDOTES',
+      data: anecdotes
+    })
   }
 }
 

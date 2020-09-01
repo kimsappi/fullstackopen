@@ -9,5 +9,5 @@ export const getAll = async () => {
 
 export const saveAnecdote = async anecdote => {
   const response = await axios.post(baseUrl, anecdote)
-  return true
+  return response
 }
