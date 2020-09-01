@@ -1,24 +1,20 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 
 import { voteForAnecdote } from '../reducers/anecdoteReducer'
 import { createNewNotification } from '../reducers/notificationReducer'
 
-const AnecdoteList = () => {
-  const anecdotes = useSelector(state => state.anecdotes)
-  const filter = useSelector(state => state.filter)
-  const dispatch = useDispatch()
-
+const AnecdoteList = (props) => {
   const vote = anecdote => {
-    dispatch(voteForAnecdote(anecdote))
-    dispatch(createNewNotification(`You voted for '${anecdote.content}'`, 5))
+    voteForAnecdote(anecdote)
+    createNewNotification(`You voted for '${anecdote.content}'`, 5)
   }
 
   return (
     <>
-      {anecdotes
+      {props.anecdotes
         .sort((a, b) => b.votes - a.votes)
-        .filter(anecdote => anecdote.content.includes(filter))
+        .filter(anecdote => anecdote.content.includes(props.filter))
         .map(anecdote =>
           <div key={anecdote.id}>
             <div>
@@ -34,4 +30,14 @@ const AnecdoteList = () => {
   )
 }
 
-export default AnecdoteList
+const mapStateToProps = (state) => {
+  // sometimes it is useful to console log from mapStateToProps
+  console.log(state)
+  return {
+    anecdotes: state.anecdotes,
+    filter: state.filter
+  }
+}
+
+const ConnectedAnecdoteList = connect(mapStateToProps)(AnecdoteList)
+export default ConnectedAnecdoteList
