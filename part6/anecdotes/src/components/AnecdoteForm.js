@@ -2,6 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 
 import { createNewAnecdote } from '../reducers/anecdoteReducer'
+import { createNewNotification } from '../reducers/notificationReducer'
 
 const AnecdoteForm = () => {
   const dispatch = useDispatch()
@@ -9,8 +10,10 @@ const AnecdoteForm = () => {
   const createAnecdote = event => {
     event.preventDefault()
     const anecdoteText = event.target.anecdote.value
-    if (anecdoteText.length)
+    if (anecdoteText.length) {
       dispatch(createNewAnecdote(anecdoteText))
+      dispatch(createNewNotification(`You created the anecdote '${anecdoteText}'`, 5))
+    }
   }
 
   return (

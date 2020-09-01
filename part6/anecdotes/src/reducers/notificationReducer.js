@@ -1,11 +1,14 @@
-export const createNewNotification = content => {
-  return {
-    type: 'CREATE_NOTIFICATION',
-    data: content
+export const createNewNotification = (content, time) => {
+  return dispatch => {
+    dispatch({
+      type: 'CREATE_NOTIFICATION',
+      data: content
+    })
+    setTimeout(() => {dispatch(destroyNotification())}, time * 1000)
   }
 }
 
-export const destroyNotification = content => {
+const destroyNotification = content => {
   return {
     type: 'DESTROY_NOTIFICATION'
   }

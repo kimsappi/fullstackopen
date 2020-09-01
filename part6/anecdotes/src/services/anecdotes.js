@@ -1,5 +1,4 @@
 import axios from 'axios'
-import AnecdoteList from '../components/AnecdoteList'
 
 const baseUrl = 'http://localhost:3001/anecdotes'
 
