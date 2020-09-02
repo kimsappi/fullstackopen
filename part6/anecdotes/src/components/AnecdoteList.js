@@ -6,8 +6,8 @@ import { createNewNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
   const vote = anecdote => {
-    voteForAnecdote(anecdote)
-    createNewNotification(`You voted for '${anecdote.content}'`, 5)
+    props.voteForAnecdote(anecdote)
+    props.createNewNotification(`You voted for '${anecdote.content}'`, 5)
   }
 
   return (
@@ -39,5 +39,10 @@ const mapStateToProps = (state) => {
   }
 }
 
-const ConnectedAnecdoteList = connect(mapStateToProps)(AnecdoteList)
+const mapDispatchToProps = {
+  voteForAnecdote,
+  createNewNotification
+}
+
+const ConnectedAnecdoteList = connect(mapStateToProps, mapDispatchToProps)(AnecdoteList)
 export default ConnectedAnecdoteList

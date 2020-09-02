@@ -1,7 +1,9 @@
 export const changeFilterValue = content => {
-  return {
-    type: 'CHANGE_FILTER',
-    data: content
+  return dispatch => {
+    dispatch({
+      type: 'CHANGE_FILTER',
+      data: content
+    })
   }
 }
 
@@ -10,6 +12,7 @@ const filterReducer = (state = '', action) => {
   console.log('action', action)
   switch (action.type) {
     case 'CHANGE_FILTER':
+      console.log(action.data)
       return action.data
   
     default:
