@@ -1,5 +1,3 @@
-import Anecdote from "./Anecdote"
-
 import React from 'react'
 import { Link } from 'react-router-dom'
 
