@@ -63,7 +63,7 @@ const App = () => {
 
       <Switch>
         <Route path='/anecdotes/:id'>
-          <Anecdote anecdote={matchedAnecdote} />
+          <Anecdote anecdote={matchedAnecdote} vote={vote} />
         </Route>
         <Route path='/create'>
           <CreateNew addNew={addNew} />
