@@ -1,10 +1,13 @@
 export const createNewNotification = (content, time) => {
   return dispatch => {
+    const timeout = setTimeout(() => {dispatch(destroyNotification())}, time * 1000)
     dispatch({
       type: 'CREATE_NOTIFICATION',
-      data: content
+      data: {
+        content: content,
+        timeout: timeout
+      }
     })
-    setTimeout(() => {dispatch(destroyNotification())}, time * 1000)
   }
 }
 
@@ -14,15 +17,22 @@ const destroyNotification = content => {
   }
 }
 
-const notificationReducer = (state = null, action) => {
+const emptyNotification = {
+  content: null,
+  timeout: null
+}
+
+const notificationReducer = (state = emptyNotification, action) => {
   console.log('state now: ', state)
   console.log('action', action)
   switch (action.type) {
     case 'CREATE_NOTIFICATION':
+      if (state.timeout)
+        clearTimeout(state.timeout)
       return action.data
 
     case 'DESTROY_NOTIFICATION':
-      return null
+      return emptyNotification
   
     default:
       return state

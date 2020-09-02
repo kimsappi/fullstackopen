@@ -9,7 +9,7 @@ const AnecdoteList = (props) => {
     props.voteForAnecdote(anecdote)
     props.createNewNotification(`You voted for '${anecdote.content}'`, 5)
   }
-
+  
   return (
     <>
       {props.anecdotes
