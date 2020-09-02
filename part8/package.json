@@ -5,12 +5,16 @@
   "main": "library.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "node library.js"
+    "server": "node library.js",
+    "nodemon": "./node_modules/.bin/nodemon --ext js,json --exec npm run server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^2.17.0",
     "graphql": "^15.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }
